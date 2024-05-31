@@ -136,7 +136,7 @@ def parse_recipe(recipe_text: str, recipe_title: str, main_ingredients: list) ->
     # Check if parsed recipe is cached already
     cached_recipe = redis_client.get(cache_key)
     if cached_recipe:
-        print("!!!!   Recipe found in cache.")
+        #print("!!!!   Recipe found in cache.")
         return json.loads(cached_recipe)
 
     # Initial prompt to extract the instructions and ingredients

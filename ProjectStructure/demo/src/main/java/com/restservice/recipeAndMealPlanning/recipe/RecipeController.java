@@ -206,19 +206,22 @@ public class RecipeController {
     @CrossOrigin(origins = "http://localhost:3000") // Replace with your React app's URL
     @GetMapping("/defaultRecipe")
     public Recipe getDefaultRecipe() {
-        recipeRepository.save(defaultRecipe);//saving in the db test! works!
+        recipeRepository.save(defaultRecipe); //saving in the db test! works!
         return defaultRecipe;
     }
 
 
     // Tested with Postman (http://localhost:5000/api/v1/recipes/recipe/38)
-    @GetMapping("/recipe/{id}")
+    @CrossOrigin(origins = "http://localhost:3000") // Replace with your React app's URL
+    @GetMapping(value = "/recipe/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Recipe getRecipe(@PathVariable int id) {
         return recipeRepository.findById(id).orElse(null);
     }
 
+
     //Tested with Postman (http://localhost:5000/api/v1/recipes/getRecommendations/1)
-    @GetMapping("/getRecommendations/{userId}")
+    @CrossOrigin(origins = "http://localhost:3000") // Replace with your React app's URL
+    @GetMapping(value="/getRecommendations/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Recipe> getRecommendations(@PathVariable int userId) {
         RecommendationSystem recommendationSystem = new RecommendationSystem(recipeService, recipeRepository);
         List<Integer> recommendations = recommendationSystem.getAllRecommendations().get(userId);
@@ -243,7 +246,7 @@ public class RecipeController {
 
     // Postman: http://localhost:5000/api/v1/recipes/getRecommendations/1/categorized)
     @CrossOrigin(origins = "http://localhost:3000") // Replace with your React app's URL
-    @GetMapping("/getRecommendations/{userId}/categorized")
+    @GetMapping(value="/getRecommendations/{userId}/categorized", produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, List<Integer>> getUserCategorizedRecommendations(@PathVariable("userId") int userId) {
         RecommendationSystem recommendationSystem = new RecommendationSystem(recipeService, recipeRepository);
         List<Integer> recommendations = recommendationSystem.getAllRecommendations().get(userId);
@@ -252,7 +255,8 @@ public class RecipeController {
 
     // Tested with Postman (http://localhost:5000/api/v1/recipes/RecipeAI?recipeFormat=youtube&input=apple pie recipe&mainIngredients=apple)
     // Error in backend: CreateProcess error=2, The system cannot find the file specified
-    @PostMapping("/RecipeAI")
+    //@CrossOrigin(origins = "http://localhost:3000") // Replace with your React app's URL
+    @PostMapping(value="/RecipeAI", produces = MediaType.APPLICATION_JSON_VALUE)
     public Recipe generateRecipe(@RequestParam String recipeFormat, @RequestParam String input, @RequestParam String mainIngredients) {
         RecipeAIServer recipeAIServer = new RecipeAIServer();
         Recipe generatedRecipe = recipeAIServer.generateRecipe(recipeFormat, input, mainIngredients);
@@ -294,7 +298,7 @@ public class RecipeController {
     //  },
     //  "ingredients": []
     //}
-    @PostMapping("/addRecipe")
+    @PostMapping(value="/addRecipe", produces = MediaType.APPLICATION_JSON_VALUE)
     public Recipe addRecipe(@RequestBody Recipe newRecipe) {
         System.out.println(newRecipe.toString());
         return recipeRepository.save(newRecipe);
@@ -302,7 +306,7 @@ public class RecipeController {
 
 
     // Tested with Postman (http://localhost:5000/api/v1/recipes/addLike?recipeId=1&userId=1)
-    @PostMapping("/addLike")
+    @PostMapping(value="/addLike", produces = MediaType.APPLICATION_JSON_VALUE)
     public Recipe addLike(@RequestParam int recipeId, @RequestParam int userId) {
         Recipe recipe = recipeRepository.findById(recipeId).orElse(null);
         if (recipe == null) {
@@ -311,13 +315,71 @@ public class RecipeController {
         RecipeUserPreferencesService recipeUserPreferencesService = new RecipeUserPreferencesService(recipeUserPreferencesRepository);
         RecipeUserPreferences preferences = recipeUserPreferencesService.getPreferencesById(userId);
         if (preferences == null) {
-            preferences = new RecipeUserPreferences(userId, null, null, null,  null);
+            preferences = new RecipeUserPreferences(userId, null, null, null);
         }
 
-        preferences.getLikedRecipes().add(recipeId);
+        preferences.addLikedRecipe(recipeId);
         recipeUserPreferencesService.savePreferences(preferences);
 
         return recipeUserPreferencesService.getPreferencesById(userId).getLikedRecipes().contains(recipeId) ? recipe : null;
+    }
+
+
+    // Tested with Postman (http://localhost:5000/api/v1/recipes/removeLike?recipeId=1&userId=1)
+    @DeleteMapping(value="/removeLike", produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean removeLike(@RequestParam int recipeId, @RequestParam int userId) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElse(null);
+        if (recipe == null) {
+            return false;
+        }
+        RecipeUserPreferencesService recipeUserPreferencesService = new RecipeUserPreferencesService(recipeUserPreferencesRepository);
+        RecipeUserPreferences preferences = recipeUserPreferencesService.getPreferencesById(userId);
+        if (preferences == null) {
+            preferences = new RecipeUserPreferences(userId, null, null, null);
+        }
+        preferences.removeLikedRecipe(recipeId);
+        recipeUserPreferencesService.savePreferences(preferences);
+
+        return !recipeUserPreferencesService.getPreferencesById(userId).getLikedRecipes().contains(recipeId);
+    }
+
+
+    // Tested with Postman: http://localhost:5000/api/v1/recipes/addView?recipeId=1&userId=1
+    @PostMapping(value="/addView", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Recipe addView(@RequestParam int recipeId, @RequestParam int userId) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElse(null);
+        if (recipe == null) {
+            return null;
+        }
+        RecipeUserPreferencesService recipeUserPreferencesService = new RecipeUserPreferencesService(recipeUserPreferencesRepository);
+        RecipeUserPreferences preferences = recipeUserPreferencesService.getPreferencesById(userId);
+        if (preferences == null) {
+            preferences = new RecipeUserPreferences(userId, null, null, null);
+        }
+
+        preferences.addViewedRecipe(recipeId);
+        recipeUserPreferencesService.savePreferences(preferences);
+
+        return recipeUserPreferencesService.getPreferencesById(userId).getViewedRecipes().contains(recipeId) ? recipe : null;
+    }
+
+
+    @PostMapping(value = "/addHistory", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Recipe addHistory(@RequestParam int recipeId, @RequestParam int userId) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElse(null);
+        if (recipe == null) {
+            return null;
+        }
+        RecipeUserPreferencesService recipeUserPreferencesService = new RecipeUserPreferencesService(recipeUserPreferencesRepository);
+        RecipeUserPreferences preferences = recipeUserPreferencesService.getPreferencesById(userId);
+        if (preferences == null) {
+            preferences = new RecipeUserPreferences(userId, null, null, null);
+        }
+
+        preferences.addHistory(recipeId);
+        recipeUserPreferencesService.savePreferences(preferences);
+
+        return recipeUserPreferencesService.getPreferencesById(userId).getHistory().contains(recipeId) ? recipe : null;
     }
 
 //    @GetMapping("/AIRecipeRecommendation/{title}")
@@ -401,7 +463,8 @@ public class RecipeController {
     // Tested with Post (http://localhost:5000/api/v1/recipes/recipePageByKeyword?keyword=Lunch)
     // {
     // }
-    @GetMapping("/recipePageByKeyword")
+    @CrossOrigin(origins = "http://localhost:3000") // Replace with your React app's URL
+    @GetMapping(value = "/recipePageByKeyword", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<Recipe> getRecipeByCategory(@RequestParam String keyword, @RequestBody PageDTO pageDTO) {
         Pageable page = pageDTO.getPageable(pageDTO);
         return recipeRepository.findRecipeByCategoryOrKeywordsQuery(keyword, page);

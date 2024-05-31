@@ -83,6 +83,7 @@ public class RecommendationSystem {
         return false;
     }
 
+    // TODO REDO THIS SO IT TAKES THE ACTUAL PREFERENCES USING METHODS FROM THE RecipeUserPreferences
     // load user interactions from database
     public Map<Integer, List<Integer>> loadUserInteractions() {
         Map<Integer, List<Integer>> userInteractions = new HashMap<>();
