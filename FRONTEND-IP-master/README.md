@@ -5,8 +5,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## Available Scripts
 
 
-npm install styled-components
-npm install react-draggable
+npm install styled-components \
+npm install react-draggable \
 npm start
 
 In the project directory, you can run:
