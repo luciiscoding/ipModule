@@ -1,13 +1,11 @@
 package com.restservice.recipeAndMealPlanning.recipe;
 
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
@@ -28,5 +26,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             "OR LOWER(k) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Recipe> findRecipeByCategoryOrKeywordsQuery(@Param("keyword") String keyword, Pageable pageable);
 
+
     Page<Recipe> findRecipeByAuthorId(Integer authorId, Pageable pageable);
+
 }

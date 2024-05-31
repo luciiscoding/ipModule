@@ -3,7 +3,10 @@ package com.restservice.recipeAndMealPlanning.recipe;
 import com.restservice.shoppingListAndInventory.inventory.Ingredient;
 import com.restservice.shoppingListAndInventory.inventory.Quantity;
 import com.restservice.shoppingListAndInventory.inventory.QuantityType;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.File;
 import java.time.Duration;
@@ -21,7 +24,6 @@ import jakarta.persistence.*;
 public class Recipe {
     @Id
     @Column(name = "id")
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Integer recipeId;
 
     @Column(name = "Name")
@@ -59,6 +61,7 @@ public class Recipe {
     @ElementCollection
     @Column(name = "Keywords")
     protected List<String> keywords;
+
 
     //this will be the better quantities, brought from another db
     @Transient
@@ -162,6 +165,15 @@ public class Recipe {
                             QuantityType.fromPhrase(
                                     printableIngredients.get(i)
                             ))));
+        }
+    }
+
+    protected static boolean isValidFieldName(String fieldName){
+        try{
+            Recipe.class.getDeclaredField(fieldName);
+            return true;
+        } catch (NoSuchFieldException e) {
+            return false;
         }
     }
 }

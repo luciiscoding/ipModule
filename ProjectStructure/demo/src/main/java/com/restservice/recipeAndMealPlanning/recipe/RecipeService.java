@@ -1,5 +1,6 @@
 package com.restservice.recipeAndMealPlanning.recipe;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -7,9 +8,6 @@ import org.apache.commons.csv.CSVRecord;
 import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.Csv;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
@@ -30,7 +28,7 @@ public class RecipeService {
     @Autowired
     private RecipeRepository recipeRepository;
 
-    protected void importDB() throws Exception {
+    protected void importDB() throws Exception{
         Reader in = new FileReader("recipes.csv");
         String[] headers = {"RecipeId", "Name", "AuthorId", "AuthorName", "CookTime", "PrepTime", "TotalTime", "DatePublished", "Description", "ImageList", "RecipeCategory", "Keywords", "RecipeIngredientQuantity", "RecipeIngredientParts", "AggregatedRating", "ReviewCount", "Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent", "RecipeServings", "RecipeYield", "RecipeInstructions"};
         Reader inIngredients = new FileReader("recipes_ingredients.csv");
@@ -337,6 +335,7 @@ public class RecipeService {
         return imageLinks;
     }
 
+    //DEPRECATED; keeping just in case
     //DO NOT RUN YET! todo add missing images
     /*protected void removeBadRecipes() throws Exception {
         List<Recipe> recipes = recipeRepository.findAll();
@@ -358,11 +357,50 @@ public class RecipeService {
                 .collect(Collectors.toList());
     }
 
-    // get most popular (highest review count) recipes from the database
-    public List<Recipe> getPopularRecipesByKeyword(String keyword, int pageNumber, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "reviewCount"));
-        Page<Recipe> recipePage = recipeRepository.findRecipeByCategoryOrKeywordsQuery(keyword, pageRequest);
-        return recipePage.getContent();
+
+    public Recipe getAIRecipeRecommendation(String title) {
+        if (title == null || title.isBlank()) return null;
+        if (!title.contains("recipe")) title = title + " recipe";
+
+        StringBuilder fullOutput = null;
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("python", "src/main/java/com/restservice/recipeAndMealPlanning/recipe/recipe_ai_recommendation.py", title);
+            processBuilder.redirectErrorStream(true);
+
+            Process process = processBuilder.start();
+            Scanner scanner = new Scanner(process.getInputStream());
+
+            fullOutput = new StringBuilder();
+            while (scanner.hasNextLine()) {
+                fullOutput.append(scanner.nextLine());
+            }
+
+
+
+            int exitCode = process.waitFor();
+            if(exitCode != 0) throw new Exception();
+
+            return parseJsonToRecipe(fullOutput.toString());
+        } catch (Exception e) {
+            System.out.println("Error getting ai recommendation with args: " + title);
+            System.out.println("Python output:" + (fullOutput == null ? "null" : fullOutput.toString()));
+            e.printStackTrace();
+            return null;
+        }
     }
+
+
+    private Recipe parseJsonToRecipe(String jsonString) throws Exception{
+        ObjectMapper objectMapper = new ObjectMapper();
+        Recipe recipe = null;
+        try {
+            recipe = objectMapper.readValue(jsonString, Recipe.class);
+        } catch (Exception e) {
+            System.out.println("Error parsing JSON to Recipe object while getting ai recommendation.");
+            throw e;
+        }
+        return recipe;
+    }
+
 }
 
