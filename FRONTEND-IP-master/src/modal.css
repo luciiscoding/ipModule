@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+body.active-modal {
+    overflow-y: hidden;
+}
+
+.btn-modal {
+    padding: 10px 20px;
+    display: block;
+    margin: 100px auto 0;
+    font-size: 18px;
+}
+
+.modal, .overlay {
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+}
+
+.overlay {
+    background: rgba(49,49,49,0.8);
+}
+/* .modal-content {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1.4;
+    background: #f1f1f1;
+    padding: 14px 28px;
+    border-radius: 3px;
+    max-width: 600px;
+    min-width: 300px;
+} */
+.modal-content {
+    width: 80%; /* Increase the width */
+    height: 80%; /* Increase the height */
+    background: white;
+    border-radius: 4px;
+    transition: all 0.3s ease-in-out;
+    position: absolute; /* Change from relative to absolute */
+    padding: 20px;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Adjust for modal's own dimensions */
+    max-width: 90%; /* Prevent modal from overflowing the viewport */
+    max-height: 90%; /* Prevent modal from overflowing the viewport */
+    overflow: auto; /* Add scroll if content is larger than modal */
+    background: #1bbc98;
+    border-radius: 10px;
+
+    display: flex; /* Use Flexbox */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center;
+}
+.modal-content h2 {
+    font-size: 3em; /* Make the text bigger */
+    text-align: center; /* Center the text */
+    font-family: 'Poppins', sans-serif; 
+}
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 7px;
+    border-radius: 0%;
+    background-image: url('./Photos/close.png'); /* Replace with your image path */
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border: none;
+    width: 30px; /* Adjust as needed */
+    height: 30px;
+    background-color: transparent;
+}
+.modal-title-image {
+    width: 60%; /* Width of the image */
+    height: 0; /* Initial height of the image */
+    padding-bottom: 25%; /* Final height of the image (half of the width) */
+    display: block; /* Needed for margin: auto to work */
+    margin: auto; /* Center the image */
+    background: url('./Photos/Lasagna.jpg') no-repeat center; /* Load the image as a background */
+    background-size: cover; /* Ensure the image covers the entire area */
+    border-radius: 17px; /* Add round corners */
+    margin-top: 0px;
+}
+.text-box-container {
+    width: 100%; /* Take up the full width of the parent */
+    display: flex; /* Use Flexbox */
+    justify-content: space-between; /* Space children evenly with space on the ends */
+    margin-top: 40px;
+}
+body.modal-open {
+    overflow: hidden;
+}
+
+.text-box-left {
+    width: 28%; /* Adjust as needed */
+    padding: 10px; /* Adjust as needed */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    background-color: #effaf4;
+    border-radius: 15px;
+    margin-left: 4%;
+    margin-bottom: 4%;
+}
+
+.text-box-right {
+    width: 60%; /* Adjust as needed */
+    padding: 10px; /* Adjust as needed */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    background-color: #effaf4;
+    border-radius: 15px;
+    margin-right: 4%;
+    margin-bottom: 4%;
+}
+
+.text-box-right h3 {
+    text-align: center;
+    font-size: 24px;
+    font-family: 'Poppins', sans-serif;
+    
+}
+.text-box-left h3 {
+    text-align: center; 
+    font-size: 24px; 
+    font-family: 'Poppins', sans-serif;
+}
+.modal-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+}
+ 
+.modal-content::-webkit-scrollbar-thumb {
+    background: #888; 
+}
+
