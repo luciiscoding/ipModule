@@ -9,5 +9,13 @@
 <br>
 <b>Link:</b> https://we.tl/t-Pnd2X7xTOF
 
+<br>
+<i> csv files - recipes.csv and recipes_ingredients.csv
+<br>
 
-#### Pleaase contact the owner for more info on this repository.
+<b>Path to put it in:</b> /ProjectStructure/ 
+<br>
+<b>Link:</b> https://we.tl/t-IP4mi8sAS7
+
+
+#### Pleaase contact the owner (me) for more info on this repository.
